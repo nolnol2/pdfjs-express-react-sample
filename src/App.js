@@ -11,7 +11,7 @@ const App = () => {
     WebViewer(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/pdftron_about.pdf',
+        initialDoc: '/files/black.pdf',
         disabledElements: [
           'annotationStyleEditButton',
           'textToolGroupButton',
