@@ -4,13 +4,37 @@ import './App.css';
 
 const App = () => {
   const viewer = useRef(null);
+  let currnetXfdfString = null;
 
-  // if using a class, equivalent of componentDidMount 
+  // if using a class, equivalent of componentDidMount
   useEffect(() => {
     WebViewer(
       {
         path: '/webviewer/lib',
         initialDoc: '/files/pdftron_about.pdf',
+        // disabledElements: [
+        //   'annotationStyleEditButton',
+        //   //'textToolGroupButton',
+        //   'annotationStylePopup',
+        //   //'richTextPopup',
+        //   'textPopup',
+        //   'toolsButton',
+        //   'menuButton',
+        //   'contextMenuPopup',
+        //   'freeHandToolGroupButton',
+        //   'textToolGroupButton',
+        //   'shapeToolGroupButton',
+        //   'signatureToolButton',
+        //   'eraserToolButton',
+        //   'stickyToolButton',
+        //   'freeTextToolButton',
+        //   'miscToolGroupButton',
+        //   'signatureModal',
+        //   'signatureOverlay',
+        //   'richTextUnderlineButton',
+        //   'richTextItalicButton',
+        //   'richTextColorPalette',
+        // ]
       },
       viewer.current,
     ).then((instance) => {
@@ -18,19 +42,37 @@ const App = () => {
       const annotManager = docViewer.getAnnotationManager();
 
       docViewer.on('documentLoaded', () => {
-        const rectangleAnnot = new Annotations.RectangleAnnotation();
-        rectangleAnnot.PageNumber = 1;
-        // values are in page coordinates with (0, 0) in the top left
-        rectangleAnnot.X = 100;
-        rectangleAnnot.Y = 150;
-        rectangleAnnot.Width = 200;
-        rectangleAnnot.Height = 50;
-        rectangleAnnot.Author = annotManager.getCurrentUser();
 
-        annotManager.addAnnotation(rectangleAnnot);
-        // need to draw the annotation otherwise it won't show up until the page is refreshed
-        annotManager.redrawAnnotation(rectangleAnnot);
+        const newAnnot = new Annotations.FreeTextAnnotation();
+        newAnnot.Width = 100;
+        newAnnot.Height = 30;
+        newAnnot.X = 10;
+        newAnnot.Y = 10;
+        newAnnot.FontSize = '20pt';
+        newAnnot.TextColor = new Annotations.Color(0, 0, 0);
+        newAnnot.setPadding(new Annotations.Rect(0, 0, 0, 0));
+        newAnnot.StrokeThickness = 0;
+        newAnnot.setContents('text');
+        annotManager.addAnnotation(newAnnot, true);
+        annotManager.redrawAnnotation(newAnnot);
       });
+
+      instance.docViewer.on('mouseRightUp', e => {
+        annotManager.exportAnnotations().then((xfdfString) => {
+          console.log('export xfdf String : ', currnetXfdfString);
+          currnetXfdfString = xfdfString;
+        });
+      });
+
+      instance.docViewer.on('dblClick', e => {
+        console.log('current xfdfString :' , currnetXfdfString);
+        annotManager.importAnnotations(currnetXfdfString).then((xfdfString) => {
+          console.log('import xfdf String : ', currnetXfdfString);
+          currnetXfdfString = xfdfString;
+        });
+      });
+
+
     });
   }, []);
 
