@@ -11,12 +11,12 @@ const App = () => {
     WebViewer(
       {
         path: '/webviewer/lib',
-        initialDoc: '/files/black.pdf',
+        initialDoc: '/files/blank.pdf',
         disabledElements: [
           'annotationStyleEditButton',
           'textToolGroupButton',
           'annotationStylePopup',
-          'richTextPopup',
+          //'richTextPopup',
           'textPopup',
           'toolsButton',
           'menuButton',
@@ -41,6 +41,7 @@ const App = () => {
       const { docViewer, Annotations } = instance;
       const annotManager = docViewer.getAnnotationManager();
 
+      instance.disableTools();
       docViewer.on('documentLoaded', () => {
 
         const newAnnot = new Annotations.FreeTextAnnotation();
@@ -57,7 +58,7 @@ const App = () => {
         annotManager.redrawAnnotation(newAnnot);
       });
 
-      instance.docViewer.on('mouseRightUp', e => {
+      instance.docViewer.on('mouseRightDown', e => {
         annotManager.exportAnnotations().then((xfdfString) => {
           console.log('export xfdf String : ', currnetXfdfString);
           currnetXfdfString = xfdfString;
